@@ -1,5 +1,5 @@
 {
-  "name": "richardhj/contao-epost-nc",
+  "name": "richardhj/contao-epost-core",
   "description": "Core components for the E-POSTBUSINESS API integration for Contao Open Source CMS",
   "type": "contao-module",
   "authors": [
