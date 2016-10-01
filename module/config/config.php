@@ -16,7 +16,7 @@ array_insert(
         'epost' => [
             'epost_user' => [
                 'tables'        => ['tl_epost_user'],
-                'icon'          => 'assets/epost/images/users.png',
+                'icon'          => 'assets/epost/core/images/users.png',
                 'nested'        => 'epost_config',
                 'authorization' => ['EPost\Helper\Dca', 'handleAuthorization'],
             ],
@@ -25,7 +25,7 @@ array_insert(
 );
 
 
-$GLOBALS['BE_MOD']['epost']['epost_config']['icon'] = 'assets/epost/images/config.png';
+$GLOBALS['BE_MOD']['epost']['epost_config']['icon'] = 'assets/epost/core/images/config.png';
 
 
 /**
