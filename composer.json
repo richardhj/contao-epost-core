@@ -15,7 +15,8 @@
   },
   "require": {
     "php": "^5.4 || ^7.0",
-    "contao/core": "~3.5"
+    "contao/core": "~3.5",
+    "richardhj/epost-api": "*"
   },
   "autoload": {
     "psr-0": {
