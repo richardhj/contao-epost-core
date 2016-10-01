@@ -41,26 +41,3 @@ define('EPOST_LIF_PATH', dirname(__DIR__).'/assets/'.EPOST_DEV_ID.'_'.EPOST_APP_
  */
 $GLOBALS['TL_MODELS'][EPost\Model\User::getTable()] = 'EPost\Model\User';
 $GLOBALS['TL_MODELS'][EPost\Model\AccessToken::getTable()] = 'EPost\Model\AccessToken';
-
-
-/**
- * Notification Center Gateways
- */
-$GLOBALS['NOTIFICATION_CENTER']['GATEWAY']['epost'] = 'NotificationCenter\Gateway\EPost';
-
-
-/**
- * Notification Center Notification Types
- */
-$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE'] = array_merge_recursive(
-    (array)$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE'],
-    [
-        'contao' => [
-            'member_registration' => [
-                'epost_recipient_fields' => ['member_*'],
-                'epost_subject'          => ['member_*', 'domain'],
-                'epost_cover_letter'     => ['domain', 'link', 'member_*', 'admin_email'],
-            ],
-        ],
-    ]
-);

@@ -10,13 +10,6 @@
 
 
 /**
- * Register namespaces
- */
-NamespaceClassLoader::add('EPost', 'system/modules/epost/library');
-NamespaceClassLoader::add('NotificationCenter', 'system/modules/epost/library');
-
-
-/**
  * Register the templates
  */
 TemplateLoader::addFiles(
