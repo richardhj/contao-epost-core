@@ -16,6 +16,7 @@ use League\OAuth2\Client\Token\AccessToken as OAuthAccessToken;
 
 /**
  * Class User
+ * @property string $title
  * @property string $username
  * @property string $password Encrypted
  * @property string $authorization

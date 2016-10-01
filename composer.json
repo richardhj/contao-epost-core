@@ -15,6 +15,7 @@
   },
   "require": {
     "php": "^5.4 || ^7.0",
+    "codefog/contao-haste": "~4.13",
     "contao/core": "~3.5",
     "contao-community-alliance/nested-menu": "~1.1",
     "richardhj/epost-api": "*"

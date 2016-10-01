@@ -13,6 +13,7 @@ namespace EPost\Helper;
 use EPost\Model\AccessToken;
 use EPost\Model\User;
 use EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
+use Haste\Util\Url;
 
 
 class Dca
@@ -29,11 +30,17 @@ class Dca
         $user = User::findByPk(\Input::get('id'));
 
         if (null === $user) {
-            return 'User not found';
+            \System::log(sprintf('E-POST user ID %u does not exist', \Input::get('id')), __METHOD__, TL_ERROR);
+            \Controller::redirect('contao/main.php?act=error');
         }
 
         if ($user::OAUTH2_AUTHORIZATION_CODE_GRANT !== $user->authorization) {
-            return 'Wrong authorization type';
+            \System::log(
+                sprintf('E-POST authorization type "%s" must not be authorized manually', $user->authorization),
+                __METHOD__,
+                TL_ERROR
+            );
+            \Controller::redirect('contao/main.php?act=error');
         }
 
         /** @var AccessToken $accessToken */
@@ -51,15 +58,21 @@ class Dca
 
 
         if (null !== $token && !$token->hasExpired()) {
-            return 'Der User ist authorisiert bis: '.\Date::parse(\Date::getNumericDatimFormat(), $token->getExpires());
+            \Message::addConfirmation(
+                sprintf(
+                    'Der Benutzer <em>%s</em> ist authorisiert bis: %s',
+                    $user->title,
+                    \Date::parse(\Date::getNumericDatimFormat(), $token->getExpires())
+                )
+            );
+            \Controller::redirect(Url::removeQueryString(['key']));
         }
 
         $provider = new OAuthProvider(
             [
                 'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
-                'redirectUri'           => \Environment::get(
-                        'base'
-                    ).'system/modules/epost/assets/web/oauth2_redirect.php',
+                'redirectUri'           => \Environment::get('base')
+                    .'system/modules/epost/assets/web/oauth2_redirect.php',
                 'scopes'                => $scopes,
                 'lif'                   => file_get_contents(EPOST_LIF_PATH),
                 'enableTestEnvironment' => $user->test_environment,
