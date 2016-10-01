@@ -1,0 +1,33 @@
+{
+  "name": "richardhj/contao-epost-nc",
+  "description": "Core components for the E-POSTBUSINESS API integration for Contao Open Source CMS",
+  "type": "contao-module",
+  "authors": [
+    {
+      "name": "Richard Henkenjohann",
+      "email": "richard@henkenjohann.me",
+      "homepage": "http://henkenjohann.me",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "richard@henkenjohann.me"
+  },
+  "require": {
+    "php": "^5.4 || ^7.0",
+    "contao/core": "~3.5"
+  },
+  "autoload": {
+    "psr-0": {
+      "EPost\\": "src/"
+    }
+  },
+  "extra": {
+    "contao": {
+      "sources": {
+        "module": "system/modules/epost",
+        "assets": "assets/epost/core"
+      }
+    }
+  }
+}
