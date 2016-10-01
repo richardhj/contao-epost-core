@@ -15,8 +15,13 @@
   },
   "require": {
     "php": "^5.4 || ^7.0",
+    "avisota/core": "~1.2",
     "contao/core": "~3.5",
-    "richardhj/epost-api": "*"
+    "contaoblackforest/contao-doctrine-orm": "~2.3",
+    "contao-community-alliance/nested-menu": "~1.1",
+    "richardhj/epost-api": "*",
+    "symfony/http-foundation": "~2.7",
+    "terminal42/contao-tablelookupwizard": "~3.2"
   },
   "autoload": {
     "psr-0": {
