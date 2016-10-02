@@ -20,6 +20,7 @@ use League\OAuth2\Client\Token\AccessToken as OAuthAccessToken;
  * @property string $username
  * @property string $password Encrypted
  * @property string $authorization
+ * @property mixed  $scopes
  * @property bool   $invalidate_immediate
  * @property bool   $test_environment
  * @property int    $access_token
@@ -67,13 +68,8 @@ class User extends Model
     }
 
 
-    public function authenticate(array $scopes = [])
+    public function authenticate()
     {
-        // Fallback to minimum scopes for sending a hybrid letter
-        if (empty($scopes)) {
-            $scopes = ['create_letter', 'send_hybrid'];
-        }
-
         switch ($this->authorization) {
             case User::OAUTH2_AUTHORIZATION_CODE_GRANT:
 

@@ -10,6 +10,7 @@
 
 
 use EPost\Api\Metadata\DeliveryOptions;
+use EPost\Model\User;
 
 
 $GLOBALS['TL_LANG']['MSC']['epost']['letterTypes'] = [
@@ -40,4 +41,9 @@ $GLOBALS['TL_LANG']['MSC']['epost']['registeredOptions'] = [
     DeliveryOptions::OPTION_REGISTERED_WITH_RETURN_RECEIPT                => 'Einschreiben nur mit Option Rückschein',
     DeliveryOptions::OPTION_REGISTERED_ADDRESSEE_ONLY_WITH_RETURN_RECEIPT => 'Einschreiben mit Option Eigenhändig und Rückschein',
     DeliveryOptions::OPTION_REGISTERED_NO                                 => 'Standardbrief',
+];
+
+$GLOBALS['TL_LANG']['MSC']['epost']['authorizationTypes'] = [
+    User::OAUTH2_AUTHORIZATION_CODE_GRANT                  => 'Authorization Code Grant',
+    User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT => 'Resource Owner Password Credentials Grant',
 ];

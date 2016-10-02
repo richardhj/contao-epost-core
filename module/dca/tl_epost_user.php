@@ -76,6 +76,7 @@ $GLOBALS['TL_DCA'][$table] = [
             'settings' => [
                 'title',
                 'authorization',
+                'scopes',
                 'invalidate_immediate',
                 'test_environment',
             ],
@@ -120,11 +121,34 @@ $GLOBALS['TL_DCA'][$table] = [
                 EPost\Model\User::OAUTH2_AUTHORIZATION_CODE_GRANT,
                 EPost\Model\User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT,
             ],
+            'reference' => &$GLOBALS['TL_LANG']['MSC']['epost']['authorizationTypes'],
             'eval'      => [
                 'submitOnChange' => true,
                 'tl_class'       => 'w50',
+                'mandatory'      => true,
             ],
             'sql'       => "varchar(64) NOT NULL default ''",
+        ],
+        'scopes'               => [
+            'label'     => &$GLOBALS['TL_LANG'][$table]['scopes'],
+            'inputType' => 'checkbox',
+            'options'   => [
+                'send_letter',
+                'send_hybrid',
+                'read_letter',
+                'create_letter',
+                'delete_letter',
+                'safe',
+                'register_device',
+            ],
+            'reference' => &$GLOBALS['TL_LANG'][$table]['scopeOptions'],
+            'eval'      => [
+                'tl_class'  => '',
+                'csv'       => ' ',
+                'mandatory' => true,
+                'multiple'  => true,
+            ],
+            'sql'       => "varchar(128) NOT NULL default ''",
         ],
         'username'             => [
             'label'     => &$GLOBALS['TL_LANG'][$table]['username'],

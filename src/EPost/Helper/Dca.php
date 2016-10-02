@@ -25,8 +25,6 @@ class Dca
             return '';
         }
 
-        $scopes = ['create_letter', 'send_hybrid'];
-
         $user = User::findByPk(\Input::get('id'));
 
         if (null === $user) {
@@ -73,7 +71,7 @@ class Dca
                 'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
                 'redirectUri'           => \Environment::get('base')
                     .'system/modules/epost/assets/web/oauth2_redirect.php',
-                'scopes'                => $scopes,
+                'scopes'                => trimsplit(' ', $user->scopes),
                 'lif'                   => file_get_contents(EPOST_LIF_PATH),
                 'enableTestEnvironment' => $user->test_environment,
             ]
