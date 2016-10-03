@@ -15,21 +15,20 @@ array_insert(
     [
         'epost' => [
             'epost_user' => [
-                'tables'        => ['tl_epost_user'],
+                'tables'        => [EPost\Model\User::getTable()],
                 'icon'          => 'assets/epost/core/images/users.png',
-                'nested'        => 'epost_config',
+                'nested'        => 'epost_components:config',
                 'authorization' => ['EPost\Helper\Dca', 'handleAuthorization'],
             ],
         ],
     ]
 );
 
-
-$GLOBALS['BE_MOD']['epost']['epost_config']['icon'] = 'assets/epost/core/images/config.png';
+$GLOBALS['BE_MOD']['epost']['epost_components']['icon'] = 'assets/epost/core/images/config.png';
 
 
 /**
- * E-POSTBUSINESS API Configuration
+ * E-POSTBUSINESS API configuration
  */
 define('EPOST_DEV_ID', 'anonymous225');
 define('EPOST_APP_ID', 'Testapp225');

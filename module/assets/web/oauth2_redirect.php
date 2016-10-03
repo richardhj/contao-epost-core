@@ -32,8 +32,12 @@ require($dir.'/system/initialize.php');
 class oauth2_redirect
 {
 
+    /**
+     * Handle a OAuth redirect
+     */
     public function run()
     {
+        // Find a user by given state
         $user = User::findBy('oauth_state', \Input::get('state'));
 
         if (null === $user) {
@@ -45,6 +49,7 @@ class oauth2_redirect
             \Controller::redirect('contao/main.php?act=error');
         }
 
+        // Initiate OAuth provider. Scopes and redirectUri must be the same
         $provider = new OAuthProvider(
             [
                 'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
@@ -57,11 +62,13 @@ class oauth2_redirect
 
         if (!empty(\Input::get('error'))) {
 
+            // The user did not granted the access
             if ('access_denied' === \Input::get('error')) {
                 \Message::addError(sprintf('Der Benutzer <em>%s</em> hat den Zugriff verweigert', $user->title));
                 \Controller::redirect('contao/main.php?do=epost_user');
             }
 
+            // Miscellaneous error
             \System::log(
                 sprintf('Error occurred for authorization: %s', \Input::get('error')),
                 __METHOD__,
@@ -85,12 +92,15 @@ class oauth2_redirect
                     ]
                 );
 
+                // Update and persist the token
                 /** @var AccessToken $accessToken */
                 $accessToken = $user->getRelated('access_token');
                 $accessToken->saveAccessToken($token);
 
+                // Redirect back to the corresponding back end module OR use the url prescribed
                 $redirectUri = ('' !== $user->redirectBackUrl) ? $user->redirectBackUrl : 'contao/main.php?do=epost_user&key=authorization&id='.$user->id.'&rt='.REQUEST_TOKEN;
 
+                // Reset temp data
                 $user->oauth_state = '';
                 $user->redirectBackUrl = '';
                 $user->save();

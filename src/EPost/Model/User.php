@@ -31,11 +31,14 @@ class User extends Model
 {
 
     /**
-     * Supported OAuth-2.0 authorization specifications
+     * OAuth-2.0 authorization specifications
      */
     const OAUTH2_AUTHORIZATION_CODE_GRANT = 'authorization_code_grant';
 
 
+    /**
+     * OAuth-2.0 authorization specifications
+     */
     const OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT = 'resource_owner_password_credentials_grant';
 
 
@@ -51,12 +54,22 @@ class User extends Model
     protected $token;
 
 
+    /**
+     * Url to the authorization back end module
+     *
+     * @return string
+     */
     public function getAuthorizationUrl()
     {
         return 'contao/main.php?do=epost_user&key=authorization&id='.$this->id.'&rt='.REQUEST_TOKEN;
     }
 
 
+    /**
+     * Redirect to the authorization back end module preserving a prescribed redirect back url
+     *
+     * @param string $redirectBackUrl
+     */
     public function redirectForAuthorization($redirectBackUrl = '')
     {
         if ('' !== $redirectBackUrl) {
@@ -68,6 +81,11 @@ class User extends Model
     }
 
 
+    /**
+     * Authenticate the user and return the AccessToken or false otherwise
+     *
+     * @return OAuthAccessToken|false
+     */
     public function authenticate()
     {
         switch ($this->authorization) {
@@ -90,7 +108,6 @@ class User extends Model
                 break;
 
             case User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT:
-                // Authenticate
                 $provider = new OAuthProvider(
                     [
                         'scopes'                => ['create_letter', 'send_hybrid'],
@@ -119,6 +136,9 @@ class User extends Model
     }
 
 
+    /**
+     * Invalidate the access token
+     */
     public function __destruct()
     {
         if ('' !== $this->access_token && $this->invalidate_immediate) {

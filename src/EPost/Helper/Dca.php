@@ -16,15 +16,25 @@ use EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
 use Haste\Util\Url;
 
 
+/**
+ * Class Dca
+ * @package EPost\Helper
+ */
 class Dca
 {
 
+    /**
+     * Back end module checking the given AccessToken and redirects to the OAuth provider if necessary
+     *
+     * @return string empty
+     */
     public function handleAuthorization()
     {
         if ('authorization' !== \Input::get('key')) {
             return '';
         }
 
+        /** @var User $user */
         $user = User::findByPk(\Input::get('id'));
 
         if (null === $user) {
@@ -32,6 +42,7 @@ class Dca
             \Controller::redirect('contao/main.php?act=error');
         }
 
+        // This module is for Authorization Code Grant necessary exclusively
         if ($user::OAUTH2_AUTHORIZATION_CODE_GRANT !== $user->authorization) {
             \System::log(
                 sprintf('E-POST authorization type "%s" must not be authorized manually', $user->authorization),
@@ -44,6 +55,7 @@ class Dca
         /** @var AccessToken $accessToken */
         $accessToken = $user->getRelated('access_token');
 
+        // Make sure to relate at least an empty AccessToken instance
         if (null === $accessToken) {
             $accessToken = new AccessToken();
             $accessToken->pid = $user->id;
@@ -54,7 +66,7 @@ class Dca
 
         $token = $accessToken->createAccessToken();
 
-
+        // Token is valid
         if (null !== $token && !$token->hasExpired()) {
             \Message::addConfirmation(
                 sprintf(
@@ -66,6 +78,7 @@ class Dca
             \Controller::redirect(Url::removeQueryString(['key']));
         }
 
+        // Prepare authorization redirect
         $provider = new OAuthProvider(
             [
                 'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
@@ -79,6 +92,7 @@ class Dca
 
         $authUrl = $provider->getAuthorizationUrl();
 
+        // Save the state for later handling
         $user->oauth_state = $provider->getState();
         $user->save();
 

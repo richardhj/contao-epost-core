@@ -18,8 +18,7 @@ $GLOBALS['TL_DCA'][$table] = [
     // Config
     'config'                => [
         'dataContainer' => 'Table',
-        'sql'           =>
-            [
+        'sql'           => [
                 'keys' => [
                     'id' => 'primary',
                 ],

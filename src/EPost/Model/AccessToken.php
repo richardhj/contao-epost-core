@@ -25,6 +25,11 @@ class AccessToken extends Model
     protected static $strTable = 'tl_epost_access_token';
 
 
+    /**
+     * Persist a given AccessToken instance with encrypted token
+     *
+     * @param OAuth2AccessToken $objAccessToken
+     */
     public function saveAccessToken(OAuth2AccessToken $objAccessToken)
     {
         $arrData = $objAccessToken->jsonSerialize();
@@ -35,6 +40,11 @@ class AccessToken extends Model
     }
 
 
+    /**
+     * Load a AccessToken from database
+     *
+     * @return OAuth2AccessToken|null
+     */
     public function createAccessToken()
     {
         $arrData = json_decode($this->data, true);

@@ -7,10 +7,13 @@
  */
 
 
+$table = EPost\Model\AccessToken::getTable();
+
+
 /**
  * Table tl_epost_access_token
  */
-$GLOBALS['TL_DCA']['tl_epost_access_token'] = [
+$GLOBALS['TL_DCA'][$table] = [
 
     // Config
     'config' => [
@@ -29,7 +32,7 @@ $GLOBALS['TL_DCA']['tl_epost_access_token'] = [
         'pid'  => [
             'relation' => [
                 'type'  => 'belongsTo',
-                'table' => \EPost\Model\User::getTable(),
+                'table' => EPost\Model\User::getTable(),
             ],
             'sql'      => "int(10) unsigned NOT NULL default '0'",
         ],
