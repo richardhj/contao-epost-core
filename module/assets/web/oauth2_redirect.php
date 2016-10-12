@@ -105,6 +105,11 @@ class oauth2_redirect
                 $user->redirectBackUrl = '';
                 $user->save();
 
+                \System::log(
+                    sprintf('An AccessToken for user ID %u was fetched and saved successfully', $user->id),
+                    __METHOD__,
+                    TL_ERROR
+                );
                 \Controller::redirect($redirectUri);
 
             } catch (IdentityProviderException $e) {
