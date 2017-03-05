@@ -18,6 +18,7 @@ $GLOBALS['TL_DCA'][$table] = [
     // Config
     'config'                => [
         'dataContainer' => 'Table',
+        'onsubmit_callback' => [['EPost\Helper\Dca', 'checkCredentials']],
         'sql'           => [
                 'keys' => [
                     'id' => 'primary',

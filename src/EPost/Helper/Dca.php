@@ -14,6 +14,7 @@ use EPost\Model\AccessToken;
 use EPost\Model\User;
 use EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
 use Haste\Util\Url;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 
 /**
@@ -22,6 +23,37 @@ use Haste\Util\Url;
  */
 class Dca
 {
+
+
+    public function checkCredentials(\DataContainer $dataContainer)
+    {
+        // Prepare authorization redirect
+        $provider = new OAuthProvider(
+            [
+                'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
+                'scopes'                => $dataContainer->activeRecord->scopes,
+                'lif'                   => file_get_contents(EPOST_LIF_PATH),
+                'enableTestEnvironment' => $dataContainer->activeRecord->test_environment,
+            ]
+        );
+
+        try {
+            // Try to get an access token using the resource owner password credentials grant.
+            $provider->getAccessToken(
+                'password',
+                [
+                    'username' => $dataContainer->activeRecord->username,
+                    'password' => \Encryption::decrypt($dataContainer->activeRecord->password),
+                ]
+            );
+
+        } catch (IdentityProviderException $e) {
+            \Message::addError($e->getResponseBody()['error_description']);
+        }
+
+        \Message::addConfirmation('Ein Login mit den angegebenen Zugangsdaten war erfolgreich.');
+    }
+
 
     /**
      * Back end module checking the given AccessToken and redirects to the OAuth provider if necessary
