@@ -88,6 +88,8 @@ class User extends Model
      */
     public function authenticate()
     {
+        global $container;
+
         switch ($this->authorization) {
             case User::OAUTH2_AUTHORIZATION_CODE_GRANT:
 
@@ -111,7 +113,11 @@ class User extends Model
                 $provider = new OAuthProvider(
                     [
                         'scopes'                => ['create_letter', 'send_hybrid'],
-                        'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
+                        'clientId'              => sprintf(
+                            '%s,%s',
+                            $container['contao-epost.dev-id'],
+                            $container['contao-epost.app-id']
+                        ),
                         'lif'                   => file_get_contents(EPOST_LIF_PATH),
                         'enableTestEnvironment' => $this->test_environment,
                     ]

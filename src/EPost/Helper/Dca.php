@@ -27,12 +27,18 @@ class Dca
 
     public function checkCredentials(\DataContainer $dataContainer)
     {
+        global $container;
+
         // Prepare authorization redirect
         $provider = new OAuthProvider(
             [
-                'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
-                'scopes'                => $dataContainer->activeRecord->scopes,
-                'lif'                   => file_get_contents(EPOST_LIF_PATH),
+                'clientId' => sprintf(
+                    '%s,%s',
+                    $container['contao-epost.dev-id'],
+                    $container['contao-epost.app-id']
+                ),
+                'scopes' => $dataContainer->activeRecord->scopes,
+                'lif' => file_get_contents(EPOST_LIF_PATH),
                 'enableTestEnvironment' => $dataContainer->activeRecord->test_environment,
             ]
         );
@@ -62,6 +68,8 @@ class Dca
      */
     public function handleAuthorization()
     {
+        global $container;
+
         if ('authorization' !== \Input::get('key')) {
             return '';
         }
@@ -113,9 +121,13 @@ class Dca
         // Prepare authorization redirect
         $provider = new OAuthProvider(
             [
-                'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
+                'clientId'              => sprintf(
+                    '%s,%s',
+                    $container['contao-epost.dev-id'],
+                    $container['contao-epost.app-id']
+                ),
                 'redirectUri'           => \Environment::get('base')
-                    .'system/modules/epost/assets/web/oauth2_redirect.php',
+                                           .'system/modules/epost/assets/web/oauth2_redirect.php',
                 'scopes'                => trimsplit(' ', $user->scopes),
                 'lif'                   => file_get_contents(EPOST_LIF_PATH),
                 'enableTestEnvironment' => $user->test_environment,

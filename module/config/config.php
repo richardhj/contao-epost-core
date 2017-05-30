@@ -28,14 +28,6 @@ $GLOBALS['BE_MOD']['epost']['epost_components']['icon'] = 'assets/epost/core/ima
 
 
 /**
- * E-POSTBUSINESS API configuration
- */
-define('EPOST_DEV_ID', 'richardhj');
-define('EPOST_APP_ID', 'contao_epost_core');
-define('EPOST_LIF_PATH', dirname(__DIR__).'/assets/'.EPOST_DEV_ID.'_'.EPOST_APP_ID.'.lif');
-
-
-/**
  * Models
  */
 $GLOBALS['TL_MODELS'][EPost\Model\User::getTable()] = 'EPost\Model\User';

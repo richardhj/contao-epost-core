@@ -37,6 +37,8 @@ class oauth2_redirect
      */
     public function run()
     {
+        global $container;
+
         // Find a user by given state
         $user = User::findBy('oauth_state', \Input::get('state'));
 
@@ -52,7 +54,11 @@ class oauth2_redirect
         // Initiate OAuth provider. Scopes and redirectUri must be the same
         $provider = new OAuthProvider(
             [
-                'clientId'              => sprintf('%s,%s', EPOST_DEV_ID, EPOST_APP_ID),
+                'clientId'              => sprintf(
+                    '%s,%s',
+                    $container['contao-epost.dev-id'],
+                    $container['contao-epost.app-id']
+                ),
                 'redirectUri'           => \Environment::get('base').\Environment::get('scriptName'),
                 'scopes'                => trimsplit(' ', $user->scopes),
                 'lif'                   => file_get_contents(EPOST_LIF_PATH),
