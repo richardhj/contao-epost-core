@@ -15,10 +15,11 @@
   },
   "require": {
     "php": "^5.4 || ^7.0",
-    "codefog/contao-haste": "~4.13",
-    "contao/core": "~3.5",
-    "contao-community-alliance/nested-menu": "~1.1",
-    "richardhj/epost-api": "*"
+    "codefog/contao-haste": "^4.13",
+    "contao/core": "^3.5",
+    "contao-community-alliance/nested-menu": "^1.1",
+    "contao-community-alliance/dependency-container": "^1.8",
+    "richardhj/epost-api": "^0.9"
   },
   "autoload": {
     "psr-0": {
