@@ -13,6 +13,6 @@ $container['contao-epost.dev-id'] = 'richardhj';
 $container['contao-epost.app-id'] = 'contao_epost_core';
 $container['contao-epost.lif']    = $container->share(
     function () {
-        return file_get_contents(dirname(__DIR__).'/PROD_richardhj_contao_epost_core.lif');
+        return file_get_contents(__DIR__.'/PROD_richardhj_contao_epost_core.lif');
     }
 );
