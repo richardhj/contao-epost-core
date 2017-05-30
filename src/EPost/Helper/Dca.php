@@ -38,7 +38,7 @@ class Dca
                     $container['contao-epost.app-id']
                 ),
                 'scopes' => $dataContainer->activeRecord->scopes,
-                'lif' => file_get_contents(EPOST_LIF_PATH),
+                'lif' => $container['contao-epost.lif'],
                 'enableTestEnvironment' => $dataContainer->activeRecord->test_environment,
             ]
         );
@@ -129,7 +129,7 @@ class Dca
                 'redirectUri'           => \Environment::get('base')
                                            .'system/modules/epost/assets/web/oauth2_redirect.php',
                 'scopes'                => trimsplit(' ', $user->scopes),
-                'lif'                   => file_get_contents(EPOST_LIF_PATH),
+                'lif'                   => $container['contao-epost.lif'],
                 'enableTestEnvironment' => $user->test_environment,
             ]
         );

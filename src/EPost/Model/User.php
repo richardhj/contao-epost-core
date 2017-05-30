@@ -118,7 +118,7 @@ class User extends Model
                             $container['contao-epost.dev-id'],
                             $container['contao-epost.app-id']
                         ),
-                        'lif'                   => file_get_contents(EPOST_LIF_PATH),
+                        'lif'                   => $container['contao-epost.lif'],
                         'enableTestEnvironment' => $this->test_environment,
                     ]
                 );

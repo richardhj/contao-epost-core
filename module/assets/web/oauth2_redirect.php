@@ -61,7 +61,7 @@ class oauth2_redirect
                 ),
                 'redirectUri'           => \Environment::get('base').\Environment::get('scriptName'),
                 'scopes'                => trimsplit(' ', $user->scopes),
-                'lif'                   => file_get_contents(EPOST_LIF_PATH),
+                'lif'                   => $container['contao-epost.lif'],
                 'enableTestEnvironment' => $user->test_environment,
             ]
         );
