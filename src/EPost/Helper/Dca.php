@@ -1,44 +1,60 @@
 <?php
+
 /**
- * E-POSTBUSINESS API integration for Contao Open Source CMS
+ * This file is part of richardhj/contao-epost-core.
  *
- * Copyright (c) 2015-2016 Richard Henkenjohann
+ * Copyright (c) 2015-2017 Richard Henkenjohann
  *
- * @package E-POST
- * @author  Richard Henkenjohann <richard-epost@henkenjohann.me>
+ * @package   richardhj/contao-epost-core
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2015-2017 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-epost-core/blob/master/LICENSE
  */
 
-namespace EPost\Helper;
+namespace Richardhj\EPost\Contao\Helper;
 
-use EPost\Model\AccessToken;
-use EPost\Model\User;
-use EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
+use Contao\DataContainer;
+use Contao\Date;
+use Contao\Encryption;
+use Contao\Environment;
+use Contao\Input;
+use ContaoCommunityAlliance\Contao\Bindings\ContaoEvents;
+use ContaoCommunityAlliance\Contao\Bindings\Events\Controller\RedirectEvent;
+use ContaoCommunityAlliance\Contao\Bindings\Events\Message\AddMessageEvent;
+use ContaoCommunityAlliance\Contao\Bindings\Events\System\LogEvent;
 use Haste\Util\Url;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Richardhj\EPost\Contao\Model\AccessToken;
+use Richardhj\EPost\Contao\Model\User;
+use Richardhj\EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 
 /**
  * Class Dca
- * @package EPost\Helper
+ *
+ * @package Richardhj\EPost\Contao\Helper
  */
 class Dca
 {
 
-
-    public function checkCredentials(\DataContainer $dataContainer)
+    /**
+     * @param DataContainer $dataContainer
+     */
+    public function checkCredentials(DataContainer $dataContainer)
     {
         global $container;
 
         // Prepare authorization redirect
         $provider = new OAuthProvider(
             [
-                'clientId' => sprintf(
+                'clientId'              => sprintf(
                     '%s,%s',
                     $container['contao-epost.dev-id'],
                     $container['contao-epost.app-id']
                 ),
-                'scopes' => $dataContainer->activeRecord->scopes,
-                'lif' => $container['contao-epost.lif'],
+                'scopes'                => $dataContainer->activeRecord->scopes,
+                'lif'                   => $container['contao-epost.lif'],
                 'enableTestEnvironment' => $dataContainer->activeRecord->test_environment,
             ]
         );
@@ -49,15 +65,19 @@ class Dca
                 'password',
                 [
                     'username' => $dataContainer->activeRecord->username,
-                    'password' => \Encryption::decrypt($dataContainer->activeRecord->password),
+                    'password' => Encryption::decrypt($dataContainer->activeRecord->password),
                 ]
             );
 
         } catch (IdentityProviderException $e) {
-            \Message::addError($e->getResponseBody()['error_description']);
+            $this->getEventDispatcher()->dispatch(
+                AddMessageEvent::createError($e->getResponseBody()['error_description'])
+            );
         }
 
-        \Message::addConfirmation('Ein Login mit den angegebenen Zugangsdaten war erfolgreich.');
+        $this->getEventDispatcher()->dispatch(
+            AddMessageEvent::createConfirm('Ein Login mit den angegebenen Zugangsdaten war erfolgreich.')
+        );
     }
 
 
@@ -70,26 +90,42 @@ class Dca
     {
         global $container;
 
-        if ('authorization' !== \Input::get('key')) {
+        if ('authorization' !== Input::get('key')) {
             return '';
         }
 
         /** @var User $user */
-        $user = User::findByPk(\Input::get('id'));
+        $user = User::findByPk(Input::get('id'));
 
         if (null === $user) {
-            \System::log(sprintf('E-POST user ID %u does not exist', \Input::get('id')), __METHOD__, TL_ERROR);
-            \Controller::redirect('contao/main.php?act=error');
+            $this->getEventDispatcher()->dispatch(
+                ContaoEvents::SYSTEM_LOG,
+                new LogEvent(
+                    sprintf('E-POST user ID %u does not exist', Input::get('id')),
+                    __METHOD__,
+                    TL_ERROR
+                )
+            );
+            $this->getEventDispatcher()->dispatch(
+                ContaoEvents::CONTROLLER_REDIRECT,
+                new RedirectEvent('contao/main.php?act=error')
+            );
         }
 
         // This module is for Authorization Code Grant necessary exclusively
         if ($user::OAUTH2_AUTHORIZATION_CODE_GRANT !== $user->authorization) {
-            \System::log(
-                sprintf('E-POST authorization type "%s" must not be authorized manually', $user->authorization),
-                __METHOD__,
-                TL_ERROR
+            $this->getEventDispatcher()->dispatch(
+                ContaoEvents::SYSTEM_LOG,
+                new LogEvent(
+                    sprintf('E-POST authorization type "%s" must not be authorized manually', $user->authorization),
+                    __METHOD__,
+                    TL_ERROR
+                )
             );
-            \Controller::redirect('contao/main.php?act=error');
+            $this->getEventDispatcher()->dispatch(
+                ContaoEvents::CONTROLLER_REDIRECT,
+                new RedirectEvent('contao/main.php?act=error')
+            );
         }
 
         /** @var AccessToken $accessToken */
@@ -97,7 +133,7 @@ class Dca
 
         // Make sure to relate at least an empty AccessToken instance
         if (null === $accessToken) {
-            $accessToken = new AccessToken();
+            $accessToken      = new AccessToken();
             $accessToken->pid = $user->id;
             $accessToken->save();
             $user->access_token = $accessToken->id;
@@ -108,14 +144,19 @@ class Dca
 
         // Token is valid
         if (null !== $token && !$token->hasExpired()) {
-            \Message::addConfirmation(
-                sprintf(
-                    'Der Benutzer <em>%s</em> ist authorisiert bis: %s',
-                    $user->title,
-                    \Date::parse(\Date::getNumericDatimFormat(), $token->getExpires())
+            $this->getEventDispatcher()->dispatch(
+                AddMessageEvent::createConfirm(
+                    sprintf(
+                        'Der Benutzer <em>%s</em> ist authorisiert bis: %s',
+                        $user->title,
+                        Date::parse(Date::getNumericDatimFormat(), $token->getExpires())
+                    )
                 )
             );
-            \Controller::redirect(Url::removeQueryString(['key']));
+            $this->getEventDispatcher()->dispatch(
+                ContaoEvents::CONTROLLER_REDIRECT,
+                new RedirectEvent(Url::removeQueryString(['key']))
+            );
         }
 
         // Prepare authorization redirect
@@ -126,8 +167,8 @@ class Dca
                     $container['contao-epost.dev-id'],
                     $container['contao-epost.app-id']
                 ),
-                'redirectUri'           => \Environment::get('base')
-                                           .'system/modules/epost/assets/web/oauth2_redirect.php',
+                'redirectUri'           => Environment::get('base')
+                                           . 'system/modules/epost/assets/web/oauth2_redirect.php',
                 'scopes'                => trimsplit(' ', $user->scopes),
                 'lif'                   => $container['contao-epost.lif'],
                 'enableTestEnvironment' => $user->test_environment,
@@ -140,8 +181,19 @@ class Dca
         $user->oauth_state = $provider->getState();
         $user->save();
 
-        \Controller::redirect($authUrl);
+        $this->getEventDispatcher()->dispatch(
+            ContaoEvents::CONTROLLER_REDIRECT,
+            new RedirectEvent($authUrl)
+        );
 
         return '';
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    private function getEventDispatcher()
+    {
+        return $GLOBALS['container']['event-dispatcher'];
     }
 }

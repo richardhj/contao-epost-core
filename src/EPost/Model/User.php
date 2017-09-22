@@ -1,17 +1,25 @@
 <?php
+
 /**
- * E-POSTBUSINESS API integration for Contao Open Source CMS
- * Copyright (c) 2015-2016 Richard Henkenjohann
- * @package E-POST
- * @author  Richard Henkenjohann <richard-epost@henkenjohann.me>
+ * This file is part of richardhj/contao-epost-core.
+ *
+ * Copyright (c) 2015-2017 Richard Henkenjohann
+ *
+ * @package   richardhj/contao-epost-core
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2015-2017 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-epost-core/blob/master/LICENSE
  */
 
-namespace EPost\Model;
+namespace Richardhj\EPost\Contao\Model;
 
 
 use Contao\Model;
-use EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
+use ContaoCommunityAlliance\Contao\Bindings\ContaoEvents;
+use ContaoCommunityAlliance\Contao\Bindings\Events\Controller\RedirectEvent;
 use League\OAuth2\Client\Token\AccessToken as OAuthAccessToken;
+use Richardhj\EPost\OAuth2\Client\Provider\EPost as OAuthProvider;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 
 /**
@@ -77,7 +85,10 @@ class User extends Model
             $this->save();
         }
 
-        \Controller::redirect($this->getAuthorizationUrl());
+        $this->getEventDispatcher()->dispatch(
+            ContaoEvents::CONTROLLER_REDIRECT,
+            new RedirectEvent($this->getAuthorizationUrl())
+        );
     }
 
 
@@ -150,5 +161,13 @@ class User extends Model
         if ('' !== $this->access_token && $this->invalidate_immediate) {
 //            $this->logout();
         }
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    private function getEventDispatcher()
+    {
+        return $GLOBALS['container']['event-dispatcher'];
     }
 }
