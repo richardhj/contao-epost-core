@@ -1,2 +1,3 @@
-richardhj.contao_epost_core.controller.oauth2_redirect:
-    class: Richardhj\ContaoEPostCoreBundle\Controller\OAuth2Redirect
+services:
+    richardhj.contao_epost_core.controller.oauth2_redirect:
+        class: Richardhj\ContaoEPostCoreBundle\Controller\OAuth2Redirect
