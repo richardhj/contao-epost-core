@@ -14,25 +14,27 @@
     "email": "richard@henkenjohann.me"
   },
   "require": {
-    "php": "^5.4 || ^7.0",
+    "php": "^7.2",
     "codefog/contao-haste": "^4.13",
-    "contao/core": "^3.5",
-    "contao-community-alliance/events-contao-bindings": "^3.2",
-    "contao-community-alliance/nested-menu": "^1.1",
-    "contao-community-alliance/dependency-container": "^1.8",
-    "richardhj/epost-api": "^0.10"
+    "contao/core-bundle": "^4.5",
+    "contao/manager-plugin": "^2.2",
+    "richardhj/epost-api": "^0.10@alpha",
+    "richardhj/oauth2-epost": "^0.10@alpha",
+    "league/oauth2-client": "^2.3",
+    "paragonie/halite": "^4.4",
+    "symfony/dependency-injection": "^3.3 || ^4.0",
+    "symfony/config": "^3.3 || ^4.0",
+    "symfony/http-kernel": "^3.3 || ^4.0",
+    "symfony/framework-bundle": "^3.3 || ^4.0",
+    "symfony/http-foundation": "^3.3 || ^4.0",
+    "symfony/routing": "^3.3 || ^4.0"
   },
   "autoload": {
-    "psr-0": {
-      "Richardhj\\EPost\\Contao": "src/"
+    "psr-4": {
+      "Richardhj\\ContaoEPostCoreBundle\\": "src/"
     }
   },
   "extra": {
-    "contao": {
-      "sources": {
-        "module": "system/modules/epost",
-        "assets": "assets/epost/core"
-      }
-    }
+    "contao-manager-plugin": "Richardhj\\ContaoEPostCoreBundle\\ContaoManager\\Plugin"
   }
 }

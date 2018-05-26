@@ -1,0 +1,6 @@
+richardhj.contao_epost_core.oauth2_redirect:
+    path: /_contao/epost_core_oauth2
+    defaults:
+        _scope: frontend
+        _token_check: false
+        _controller: richardhj.contao_epost_core.controller.oauth2_redirect

@@ -1,12 +1,16 @@
 <?php
+
 /**
- * E-POSTBUSINESS API integration for Contao Open Source CMS
+ * This file is part of richardhj/contao-epost-core.
  *
- * Copyright (c) 2015-2016 Richard Henkenjohann
+ * Copyright (c) 2015-2018 Richard Henkenjohann
  *
- * @package E-POST
- * @author  Richard Henkenjohann <richard-epost@henkenjohann.me>
+ * @package   richardhj/contao-epost-core
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2015-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-epost-core/blob/master/LICENSE
  */
+
 
 $GLOBALS['TL_LANG']['MOD']['epost_components'][0] = 'Komponenten';
 $GLOBALS['TL_LANG']['MOD']['epost_components:config'][0] = 'Einstellungen';

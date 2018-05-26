@@ -1,29 +1,38 @@
 <?php
+
 /**
- * E-POSTBUSINESS API integration for Contao Open Source CMS
- * Copyright (c) 2015-2016 Richard Henkenjohann
- * @package E-POST
- * @author  Richard Henkenjohann <richard-epost@henkenjohann.me>
+ * This file is part of richardhj/contao-epost-core.
+ *
+ * Copyright (c) 2015-2018 Richard Henkenjohann
+ *
+ * @package   richardhj/contao-epost-core
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2015-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-epost-core/blob/master/LICENSE
  */
 
-
-$table = EPost\Model\User::getTable();
+use ParagonIE\Halite\Alerts\CannotPerformOperation;
+use ParagonIE\Halite\HiddenString;
+use ParagonIE\Halite\KeyFactory;
+use Richardhj\ContaoEPostCoreBundle\Helper\Dca;
+use Richardhj\ContaoEPostCoreBundle\Model\User;
+use ParagonIE\Halite\Symmetric\Crypto as SymmetricCrypto;
 
 
 /**
  * DCA config
  */
-$GLOBALS['TL_DCA'][$table] = [
+$GLOBALS['TL_DCA']['tl_epost_user'] = [
 
     // Config
     'config'                => [
-        'dataContainer' => 'Table',
-        'onsubmit_callback' => [['EPost\Helper\Dca', 'checkCredentials']],
-        'sql'           => [
-                'keys' => [
-                    'id' => 'primary',
-                ],
+        'dataContainer'     => 'Table',
+        'onsubmit_callback' => [[Dca::class, 'checkCredentials']],
+        'sql'               => [
+            'keys' => [
+                'id' => 'primary',
             ],
+        ],
     ],
 
     // List
@@ -47,23 +56,24 @@ $GLOBALS['TL_DCA'][$table] = [
         ],
         'operations'        => [
             'edit'   => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_epost_user']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
             ],
             'copy'   => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_epost_user']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG'][$table]['delete'],
+                'label'      => &$GLOBALS['TL_LANG']['tl_epost_user']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm']
+                                .'\'))return false;Backend.getScrollOffset()"',
             ],
             'show'   => [
-                'label' => &$GLOBALS['TL_LANG'][$table]['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_epost_user']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.gif',
             ],
@@ -86,8 +96,8 @@ $GLOBALS['TL_DCA'][$table] = [
     // MetaSubSelectPalettes
     'metasubselectpalettes' => [
         'authorization' => [
-            EPost\Model\User::OAUTH2_AUTHORIZATION_CODE_GRANT                  => [],
-            EPost\Model\User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT => [
+            User::OAUTH2_AUTHORIZATION_CODE_GRANT                  => [],
+            User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT => [
                 'username',
                 'password',
             ],
@@ -97,13 +107,13 @@ $GLOBALS['TL_DCA'][$table] = [
     // Fields
     'fields'                => [
         'id'                   => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment",
+            'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp'               => [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'sql' => 'int(10) unsigned NOT NULL default \'0\'',
         ],
         'title'                => [
-            'label'     => &$GLOBALS['TL_LANG'][$table]['title'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_epost_user']['title'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -115,11 +125,11 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'authorization'        => [
-            'label'     => &$GLOBALS['TL_LANG'][$table]['authorization'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_epost_user']['authorization'],
             'inputType' => 'select',
             'options'   => [
-                EPost\Model\User::OAUTH2_AUTHORIZATION_CODE_GRANT,
-                EPost\Model\User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT,
+                User::OAUTH2_AUTHORIZATION_CODE_GRANT,
+                User::OAUTH2_RESOURCE_OWNER_PASSWORD_CREDENTIALS_GRANT,
             ],
             'reference' => &$GLOBALS['TL_LANG']['MSC']['epost']['authorizationTypes'],
             'eval'      => [
@@ -130,7 +140,7 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'scopes'               => [
-            'label'     => &$GLOBALS['TL_LANG'][$table]['scopes'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_epost_user']['scopes'],
             'inputType' => 'checkbox',
             'options'   => [
                 'send_letter',
@@ -141,7 +151,7 @@ $GLOBALS['TL_DCA'][$table] = [
                 'safe',
                 'register_device',
             ],
-            'reference' => &$GLOBALS['TL_LANG'][$table]['scopeOptions'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_epost_user']['scopeOptions'],
             'eval'      => [
                 'tl_class'  => '',
                 'csv'       => ' ',
@@ -151,7 +161,7 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql'       => "varchar(128) NOT NULL default ''",
         ],
         'username'             => [
-            'label'     => &$GLOBALS['TL_LANG'][$table]['username'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_epost_user']['username'],
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => [
@@ -162,7 +172,7 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'password'             => [
-            'label'         => &$GLOBALS['TL_LANG'][$table]['password'],
+            'label'         => &$GLOBALS['TL_LANG']['tl_epost_user']['password'],
             'exclude'       => true,
             'inputType'     => 'text',
             'eval'          => [
@@ -173,23 +183,39 @@ $GLOBALS['TL_DCA'][$table] = [
                 'tl_class'     => 'w50',
             ],
             'load_callback' => function ($value) {
-                if (strlen($value)) {
-                    return \Encryption::encrypt('*****');
+                if ('' !== $value) {
+                    $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost/secret.key';
+                    try {
+                        $key = KeyFactory::loadEncryptionKey($keyPath);
+                    } catch (CannotPerformOperation $e) {
+                        $key = KeyFactory::generateEncryptionKey();
+                        KeyFactory::save($key, $keyPath);
+                    }
+
+                    return SymmetricCrypto::encrypt(new HiddenString('*****'), $key);
                 }
 
                 return $value;
             },
             'save_callback' => function ($value, \DataContainer $dc) {
-                if ('*****' === \Encryption::decrypt($value)) {
+                $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost/secret.key';
+                try {
+                    $key = KeyFactory::loadEncryptionKey($keyPath);
+                } catch (CannotPerformOperation $e) {
+                    $key = KeyFactory::generateEncryptionKey();
+                    KeyFactory::save($key, $keyPath);
+                }
+
+                if ('*****' === SymmetricCrypto::decrypt($value, $key)) {
                     return $dc->activeRecord->password;
                 }
 
                 return $value;
             },
-            'sql'           => "text NULL",
+            'sql'           => 'text NULL',
         ],
         'invalidate_immediate' => [
-            'label'     => &$GLOBALS['TL_LANG'][$table]['invalidate_immediate'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_epost_user']['invalidate_immediate'],
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
@@ -199,7 +225,7 @@ $GLOBALS['TL_DCA'][$table] = [
             'sql'       => "char(1) NOT NULL default ''",
         ],
         'test_environment'     => [
-            'label'     => &$GLOBALS['TL_LANG'][$table]['test_environment'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_epost_user']['test_environment'],
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
@@ -211,12 +237,12 @@ $GLOBALS['TL_DCA'][$table] = [
         'access_token'         => [
             'relation' => [
                 'type'  => 'hasOne',
-                'table' => \EPost\Model\AccessToken::getTable(),
+                'table' => 'tl_epost_access_token',
             ],
             'sql'      => "int(10) unsigned NOT NULL default '0'",
         ],
         'oauth_state'          => [
-            'sql' => "text NULL",
+            'sql' => 'text NULL',
         ],
         'redirectBackUrl'      => [
             'sql' => "varchar(255) NOT NULL default ''",

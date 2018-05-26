@@ -1,0 +1,4 @@
+parameters:
+   contao_epost.dev_id: richardhj
+   contao_epost.app_id: contao_epost_core
+   contao_epost.lif: ~

@@ -1,17 +1,18 @@
 <?php
+
 /**
- * E-POSTBUSINESS API integration for Contao Open Source CMS
+ * This file is part of richardhj/contao-epost-core.
  *
- * Copyright (c) 2015-2016 Richard Henkenjohann
+ * Copyright (c) 2015-2018 Richard Henkenjohann
  *
- * @package E-POST
- * @author  Richard Henkenjohann <richard-epost@henkenjohann.me>
+ * @package   richardhj/contao-epost-core
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2015-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-epost-core/blob/master/LICENSE
  */
 
-
-use EPost\Api\Metadata\DeliveryOptions;
-use EPost\Model\User;
-
+use Richardhj\EPost\Api\Metadata\DeliveryOptions;
+use Richardhj\ContaoEPostCoreBundle\Model\User;
 
 $GLOBALS['TL_LANG']['MSC']['epost']['letterTypes'] = [
     DeliveryOptions::LETTER_TYPE_NORMAL => 'Elektronischer E‑POSTBRIEF',
