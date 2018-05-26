@@ -17,6 +17,7 @@ use Contao\Model;
 use Contao\System;
 use League\OAuth2\Client\Token\AccessToken as OAuth2AccessToken;
 use ParagonIE\Halite\Alerts\CannotPerformOperation;
+use ParagonIE\Halite\HiddenString;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto as SymmetricCrypto;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
@@ -47,7 +48,8 @@ class AccessToken extends Model
     public function saveAccessToken(OAuth2AccessToken $objAccessToken)
     {
         $arrData                 = $objAccessToken->jsonSerialize();
-        $arrData['access_token'] = SymmetricCrypto::encrypt($arrData['access_token'], $this->getEncryptionKey());
+        $arrData['access_token'] =
+            SymmetricCrypto::encrypt(new HiddenString($arrData['access_token']), $this->getEncryptionKey());
         $this->data              = json_encode($arrData);
 
         $this->save();
@@ -85,7 +87,7 @@ class AccessToken extends Model
      */
     private function getEncryptionKey(): EncryptionKey
     {
-        $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost/secret.key';
+        $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost-secret.key';
         try {
             $key = KeyFactory::loadEncryptionKey($keyPath);
         } catch (CannotPerformOperation $e) {

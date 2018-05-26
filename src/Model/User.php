@@ -128,7 +128,7 @@ class User extends Model
                 );
 
 
-                $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost/secret.key';
+                $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost-secret.key';
                 $encryptionKey = KeyFactory::loadEncryptionKey($keyPath);
 
                 $this->token = $provider->getAccessToken(

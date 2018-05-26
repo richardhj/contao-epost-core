@@ -25,15 +25,11 @@ array_insert(
         'epost' => [
             'epost_user' => [
                 'tables'        => ['tl_epost_user'],
-                'icon'          => 'bundles/richardhjcontaoepostcore/images/users.png',
-                'nested'        => 'epost_components:config',
                 'authorization' => [Dca::class, 'handleAuthorization'],
             ],
         ],
     ]
 );
-
-$GLOBALS['BE_MOD']['epost']['epost_components']['icon'] = 'bundles/richardhjcontaoepostcore/images/config.png';
 
 
 /**

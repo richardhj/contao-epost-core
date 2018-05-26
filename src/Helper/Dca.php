@@ -29,6 +29,8 @@ use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto as SymmetricCrypto;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -57,6 +59,8 @@ class Dca
     /**
      * Dca constructor.
      *
+     * @throws ServiceNotFoundException
+     * @throws ServiceCircularReferenceException
      * @throws InvalidArgumentException
      */
     public function __construct()
@@ -65,6 +69,7 @@ class Dca
         $this->epostAppId = System::getContainer()->getParameter('contao_epost.app_id');
         $this->epostLif   = System::getContainer()->getParameter('contao_epost.lif');
         $this->rootDir    = System::getContainer()->getParameter('kernel.project_dir');
+        $this->router     = System::getContainer()->get('router');
     }
 
     /**
@@ -79,6 +84,10 @@ class Dca
      */
     public function checkCredentials(DataContainer $dataContainer): void
     {
+        if ($dataContainer->activeRecord->authentication === User::OAUTH2_AUTHORIZATION_CODE_GRANT) {
+            return;
+        }
+
         // Prepare authorization redirect
         $provider = new OAuthProvider(
             [
@@ -98,12 +107,14 @@ class Dca
                     'password' => SymmetricCrypto::decrypt(
                         $dataContainer->activeRecord->password,
                         $this->getEncryptionKey()
-                    ),
+                    )->getString(),
                 ]
             );
 
         } catch (IdentityProviderException $e) {
             Message::addError($e->getResponseBody()['error_description']);
+
+            return;
         }
 
         Message::addConfirmation('Ein Login mit den angegebenen Zugangsdaten war erfolgreich.');
@@ -213,7 +224,7 @@ class Dca
      */
     private function getEncryptionKey(): EncryptionKey
     {
-        $keyPath = $this->rootDir.'/var/epost/secret.key';
+        $keyPath = $this->rootDir.'/var/epost-secret.key';
         try {
             $key = KeyFactory::loadEncryptionKey($keyPath);
         } catch (CannotPerformOperation $e) {

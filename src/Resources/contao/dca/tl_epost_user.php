@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_epost_user'] = [
             'eval'      => [
                 'mandatory' => true,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class'  => 'w50 clr',
             ],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
@@ -153,7 +153,7 @@ $GLOBALS['TL_DCA']['tl_epost_user'] = [
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_epost_user']['scopeOptions'],
             'eval'      => [
-                'tl_class'  => '',
+                'tl_class'  => 'clr',
                 'csv'       => ' ',
                 'mandatory' => true,
                 'multiple'  => true,
@@ -177,14 +177,18 @@ $GLOBALS['TL_DCA']['tl_epost_user'] = [
             'inputType'     => 'text',
             'eval'          => [
                 'mandatory'    => true,
-                'encrypt'      => true,
                 'hideInput'    => true,
                 'preserveTags' => true,
                 'tl_class'     => 'w50',
             ],
-            'load_callback' => function ($value) {
-                if ('' !== $value) {
-                    $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost/secret.key';
+            'load_callback' => [
+                function ($value) {
+                    return empty($value) ? '' : '*****';
+                },
+            ],
+            'save_callback' => [
+                function (string $value, \DataContainer $dc) {
+                    $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost-secret.key';
                     try {
                         $key = KeyFactory::loadEncryptionKey($keyPath);
                     } catch (CannotPerformOperation $e) {
@@ -192,26 +196,9 @@ $GLOBALS['TL_DCA']['tl_epost_user'] = [
                         KeyFactory::save($key, $keyPath);
                     }
 
-                    return SymmetricCrypto::encrypt(new HiddenString('*****'), $key);
-                }
-
-                return $value;
-            },
-            'save_callback' => function ($value, \DataContainer $dc) {
-                $keyPath = System::getContainer()->getParameter('kernel.project_dir').'/var/epost/secret.key';
-                try {
-                    $key = KeyFactory::loadEncryptionKey($keyPath);
-                } catch (CannotPerformOperation $e) {
-                    $key = KeyFactory::generateEncryptionKey();
-                    KeyFactory::save($key, $keyPath);
-                }
-
-                if ('*****' === SymmetricCrypto::decrypt($value, $key)) {
-                    return $dc->activeRecord->password;
-                }
-
-                return $value;
-            },
+                    return '*****' === $value ? $dc->activeRecord->password : SymmetricCrypto::encrypt(new HiddenString($value), $key);
+                },
+            ],
             'sql'           => 'text NULL',
         ],
         'invalidate_immediate' => [

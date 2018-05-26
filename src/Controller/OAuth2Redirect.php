@@ -45,7 +45,7 @@ class OAuth2Redirect extends Controller
                 __METHOD__,
                 TL_ERROR
             );
-            throw new RedirectResponseException('contao?act=error');
+            throw new RedirectResponseException('/contao?act=error');
         }
 
         // Initiate OAuth provider. Scopes and redirectUri must be the same
@@ -59,7 +59,7 @@ class OAuth2Redirect extends Controller
             ]
         );
 
-        if (!empty(\Input::get('error'))) {
+        if (!empty($request->query->get('error'))) {
 
             // The user did not granted the access
             if ('access_denied' === $request->query->get('error')) {
@@ -74,7 +74,7 @@ class OAuth2Redirect extends Controller
                 TL_ERROR
             );
 
-            throw new RedirectResponseException('contao?act=error');
+            throw new RedirectResponseException('/contao?act=error');
 
         }
 
@@ -82,8 +82,7 @@ class OAuth2Redirect extends Controller
 
             System::log('Malicious authorization redirect', __METHOD__, TL_ERROR);
 
-            throw new RedirectResponseException('contao?act=error');
-
+            throw new RedirectResponseException('/contao?act=error');
         }
 
         try {
@@ -102,7 +101,7 @@ class OAuth2Redirect extends Controller
 
             // Redirect back to the corresponding back end module OR use the url prescribed
             $redirectUri = ('' !== $user->redirectBackUrl) ? $user->redirectBackUrl
-                : 'contao?do=epost_user&key=authorization&id='.$user->id.'&rt='.REQUEST_TOKEN;
+                : '/contao?do=epost_user&key=authorization&id='.$user->id.'&rt='.REQUEST_TOKEN;
 
             // Reset temp data
             $user->oauth_state     = '';
@@ -123,7 +122,7 @@ class OAuth2Redirect extends Controller
                 TL_ERROR
             );
 
-            throw new RedirectResponseException('contao?act=error');
+            throw new RedirectResponseException('/contao?act=error');
         }
     }
 }
